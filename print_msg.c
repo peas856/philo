@@ -6,7 +6,7 @@
 /*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 13:21:09 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/17 14:24:06 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/18 03:20:58 by rhee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,23 +26,26 @@ char        *print_message(int option)
 		return (" has taken a fork\n");
 	else if (option == 3)
 		return (" is thinking\n");
-	else if (option == 4)
+	else //if (option == 4)
 		return (" died\n");
+    
 }
 
-void        display_message(t_op *op, t_philo *philo, int option)
+void        display_message(t_philo *philo, int option)
 {
 	static int	dead = 0;
+    struct timeval t;
 
-	pthread_mutex_lock(&op->write_m);
+	pthread_mutex_lock(&philo->op->write_m);
 	if (!dead)
 	{
-		printf("%u ", get_time() - op->start, 1);
+        gettimeofday(&t, NULL);
+		printf("%ld ", t.tv_sec - philo->op->start);
 		if (option != 4)
 			printf("%d ", philo->num + 1);
 		else
 			dead = 1;
 		print_message(option);
 	}
-	pthread_mutex_unlock(&op->write_m);
+	pthread_mutex_unlock(&philo->op->write_m);
 }

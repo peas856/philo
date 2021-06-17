@@ -6,7 +6,7 @@
 /*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 13:21:17 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/17 14:12:31 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/18 03:10:56 by rhee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,10 +58,6 @@ int         ft_init(t_op *op, int ac, char **av)
 		op->must_eat = ft_atoi(av[5]);
 	else
 		op->must_eat = 0;
-	// if (state->amount < 2 || state->amount > 200 || state->time_to_die < 60
-	// 	|| state->time_to_eat < 60 || state->time_to_sleep < 60
-	// 	|| state->must_eat_count < 0)
-	// 	return (1);
 	// state->forks_m = NULL;
 	// state->philos = NULL;
 	if (!(op->philo = (t_philo *)malloc(sizeof(t_philo) * op->n_philo)))
@@ -78,8 +74,8 @@ int         main(int ac, char **av)
 		return (ft_err("error: Invalid arguments\n"));
 	ft_init(&op, ac, av);
 	start_threads(&op); //return (clear_state(&state) && exit_error("error: fatal\n"));
-	pthread_mutex_lock(&state.somebody_dead_m);
-	pthread_mutex_unlock(&state.somebody_dead_m);
+	pthread_mutex_lock(&op.somebody_dead_m);
+	pthread_mutex_unlock(&op.somebody_dead_m);
 	clear_state(&op);
 	return (0);
 }

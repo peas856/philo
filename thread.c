@@ -6,45 +6,46 @@
 /*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 13:59:47 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/17 14:27:53 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/18 03:20:47 by rhee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./include/philosophers.h"
 
-static void *monitor_count(void *state_v)
+void        *monitor_count(void *state_v)
 {
-	t_state *state;
+	t_op    *data;
 	int		i;
 	int		total;
 
-	state = (t_state*)state_v;
+	data = (t_op *)state_v;
 	total = 0;
-	while (total < state->must_eat_count)
+	while (total < data->must_eat)
 	{
 		i = 0;
-		while (i < state->amount)
-			pthread_mutex_lock(&state->philos[i++].eat_m);
+		while (i < data->n_philo)
+			pthread_mutex_lock(&data->philo[i++].eat_m);
 		total++;
 	}
-	display_message(&state->philos[0], TYPE_OVER);
-	pthread_mutex_unlock(&state->somebody_dead_m);
+	pthread_mutex_unlock(&data->somebody_dead_m);
 	return ((void*)0);
 }
 
-static void *monitor(void *philo_v)
+void        *monitor(void *philo_v)
 {
 	t_philo		*philo;
+    struct timeval t;
 
 	philo = (t_philo*)philo_v;
 	while (1)
 	{
+        gettimeofday(&t, NULL);
 		pthread_mutex_lock(&philo->mutex);
-		if (!philo->is_eating && get_time() > philo->limit)
+		if (!philo->is_eating && t.tv_sec > philo->limit)
 		{
-			display_message(philo, TYPE_DIED);
+			display_message(philo, 4);
 			pthread_mutex_unlock(&philo->mutex);
-			pthread_mutex_unlock(&philo->state->somebody_dead_m);
+			pthread_mutex_unlock(&philo->op->somebody_dead_m);
 			return ((void*)0);
 		}
 		pthread_mutex_unlock(&philo->mutex);
@@ -52,14 +53,16 @@ static void *monitor(void *philo_v)
 	}
 }
 
-static void *routine(void *philo_v)
+void        *routine(void *philo_v)
 {
 	t_philo		*philo;
 	pthread_t	tid;
+    struct timeval  t;
 
+    gettimeofday(&t, NULL);
 	philo = (t_philo*)philo_v;
-	philo->last_eat = get_time();
-	philo->limit = philo->last_eat + philo->state->time_to_die;
+	philo->last_eat = t.tv_sec;
+	philo->limit = philo->last_eat + philo->op->time_to_die;
 	if (pthread_create(&tid, NULL, &monitor, philo_v) != 0)
 		return ((void*)1);
 	pthread_detach(tid);
@@ -68,28 +71,30 @@ static void *routine(void *philo_v)
 		take_forks(philo);
 		eat(philo);
 		clean_forks(philo);
-		display_message(philo, TYPE_THINK);
+		display_message(philo, 3);
 	}
 	return ((void*)0);
 }
 
-static int  start_threads(t_state *state)
+int         start_threads(t_op *data)
 {
 	int			i;
 	pthread_t	tid;
 	void		*philo;
+    struct timeval t;
 
-	state->start = get_time();
-	if (state->must_eat_count > 0)
+    gettimeofday(&t, NULL);
+	data->start = t.tv_sec;
+	if (data->must_eat > 0)
 	{
-		if (pthread_create(&tid, NULL, &monitor_count, (void*)state) != 0)
+		if (pthread_create(&tid, NULL, &monitor_count, (void*)data) != 0)
 			return (1);
 		pthread_detach(tid);
 	}
 	i = 0;
-	while (i < state->amount)
+	while (i < data->n_philo)
 	{
-		philo = (void*)(&state->philos[i]);
+		philo = (void*)(&data->philo[i]);
 		if (pthread_create(&tid, NULL, &routine, philo) != 0)
 			return (1);
 		pthread_detach(tid);
