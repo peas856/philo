@@ -1,0 +1,132 @@
+참고 : https://42kchoi.tistory.com/301
+
+===
+
+pthread (Posix thread) :C에서 스레드를 조작하는 표준 인터페이스
+
+1. int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routinf)(void *), void *arg);
+
+  1. thread : 성공적으로 함수가 호출되면 이곳에 thread ID가 저장
+  2. attr : 스레드의 특성을 정의합니다. 기본적으로 NULL을 지정
+  3. start_routine : 함수 포인터를 매개변수로 받습니다. 
+  4. arg : start_routine에 전달될 인자
+
+  어떤 쓰레드에서 usleep이 호출되면 다른 쓰레드에서 일을 하게 된다. 결국 main_thread와 우리가 생성한 thread가 번갈아가며 실행되는 것이다.
+
+2. int pthread_join(pthread_t thread, void **value_ptr);
+
+    스레드 종료를 대기. 대기하는 스레드가 종료되면, value_ptr 인자의 값은 pthread_exit() 함수가 전달한 종료 값을 얻음.
+
+  1. thread : 우리가 join하려고 하는 thread를 명시
+  2. retval : pthread_create에서 start_routine이 반환하는 반환값을 여기에 저장
+
+3. pthread_detach
+  thread는 우리가 detach 시킬 스레드입니다. 
+  성공시 0을 반환하며 실패시 오류 넘버를 반환
+
+  독립적인 동작을 하는 대신에 스레드가 끝이나면 반드시 자원을 반환시켜야합니다. pthread_create만으로 스레드를 생성하면 루틴이 끝나서도 자원이 반환되지 않습니다. 그러한 문제점을 해결해주는 함수가 바로 pthread_detach입니다.
+
+  pthread_join과 pthread_detach 의 차이는 join의 경우 쓰레드가 종료될 때까지 기다린다는 것이고, detach는 만나는 즉시 쓰레드를 종료시켜버린다는 것이다. 그리고 더 중요한 차이는 join은 쓰레드가 종료될 때까지 기다리므로 다른 쓰레드가 실행하는 함수가 이루어질 수 없을 수 있다는 것이고 detach는 다른 쓰레드가 실행하는 함수가 실행될 수 있다는 것이다.
+
+
+join은 쓰레드가 끝나기 전까지 main 쓰레드가 동작할 수 없게 만들고, detach는 동작할 수 있게 만든다
+
+3. int pthread_mutex_init(pthread_mutex_t *mutex, const pthred_mutexattr_t *attr);
+뮤텍스 객체 초기화
+
+먼저 mutex를 init하는 것부터 알아보자. 이것을 해주어야 mutex를 사용할 수 있게 된다.
+phtread_mutex_init 함수를 사용한다.
+
+파라미터
+pthread_mutex_t *mutex
+초기화 할 mutex 객체
+
+const pthread_mutexattr_t * attr
+mutex의 특성을 맞추기 위해 설정함. 기본적으로 NULL임.
+
+종류로 fast, recurisev, error checking이 있는데 디폴트 값은 fast이다.
+
+
+에러 ERROR
+EINVAL : attr이 이상한 값이 들어옴
+ENOMEM : 다른 뮤텍스에서 사용한 쓰레드
+
+pthread_mutex_init
+1) 정적으로 할당된 뮤텍스를 초기화하려면 PTHREAD_MUTEX_INITIALIZER 상수를 이용해서 초기화합니다.
+이런 형식으로 사용합니다. : pthread_mutex_t lock = PTHREAD_MUTX_INITIALIZER;
+2) 동적으로 초기화하려면 pthread_mutex_init 함수를 사용하면 됩니다. mutex를 사용하기 전에 초기화를 시작해야합니다.
+
+이 두 가지 함수는 mutex 임계 구역 진입 시 그 코드 구역을 잠그고 여는 역할을 해주는 함수들임.
+
+한 쓰레드에서 lock함수를 이용해 닫아줬다면 다른 코드는 그 구역에 들어가기 위해 unlock할 때까지 기다려야 한다.
+
+
+4. int pthread_mutex_lock(pthread_mutex_t *mutex);
+뮤텍스 객체 잠그기 : 이 두 함수는 mutex를 이용하여 임계 구역을 진입할때 그 코드 구역을 잠그고 다시 임계 구역이 끝날때 다시 풀어 다음 스레드가 진입할 수 있도록 합니다.
+5. int pthread_mutex_unlock(pthread_mutex_t *mutex)
+뮤텍스 객체 잠금 해제
+
+에러
+pthread_mutex_lock
+에러 시 에러코드
+EINVAL : mutex 유효하지 않음
+EDEADLK : 데드락 조건이 발생
+pthread_mutex_unlock
+에러 시 에러코드
+EINVAL : mutex 유효하지 않음
+EPERM : 현재 쓰레드가 잠겨져있지 않음
+
+6. int pthread_mutex_destroy(pthread_mutex_t *mutex);
+뮤텍스 객체 파괴
+7. int pthread_detach(pthread_t thread);
+인자 thread를 터널에서 분리시키기. 분리된 스레드는 수행을 종료하고, 할당된 자원을 회수한다.
+
+usleep()
+
+  #include <unistd.h>
+  int usleep(useconds_t useconds);
+
+  microseconds 단위로 함수를 대기시키는 함수
+  1ms = 1000us
+
+gettimeofday()
+- 마이크로초 단위의 시간을 되돌려준다, tz는 현재 사용되지 않아서 NULL로 처리하는 게 일반적이라고 한다, 성공 시 0, 실패 시 -1 리턴.
+  #include <sys/time.h>
+  int gettimeofday(struct timeval *tv, struct timezone *tz);
+첫 번째 인자인 tv는 현재 시스템 시간을 저장하기 위한 구조체이다.
+두 번째 인자인 tz 는 타임존을 설정하기 위해 사용되는 구조체이다.
+해당 구조체들은 다음과 같은 값을 갖는다.
+  struct timeval start, end;
+  double diff;
+  gettimeofday(&start, NULL);
+  usleep(1000)
+  gettimeofday(&end, NULL);
+  diff = (end.tv_sec - start.tv_sec) * 1000.0 + (end.tv_usec - start.tv_usec) / 1000.0
+  printf("%f\n", diff);
+
+  int main()
+{
+    struct timeval startTime, endTime;
+    double diff_tv_sec;
+    double diff_tv_usec;
+
+    gettimeofday(&startTime, NULL);
+    usleep(1000 * 1000);
+    gettimeofday(&endTime, NULL);
+    diff_tv_sec = ( endTime.tv_sec - startTime.tv_sec );
+    diff_tv_usec = ( endTime.tv_usec - startTime.tv_usec ) / 1000000;
+    printf("%f seconds\n", diff_tv_sec); // f는 (double로) 형변환해 출력.
+    printf("%f micro seconds\n", diff_tv_usec);
+    return 0;
+}
+
+// 결과
+// 1.000000 seconds
+// 0.000000 micro seconds
+
+philo_one
+    가장 보편적인 알고리즘!
+    첫번째 철학자가 오른쪽 포크를 먼저 집어든다!
+    나머지 철학자는 무조건 왼쪽 포크를 집어든다!
+    식사가 끝난 철학자는 무조건 오른쪽 포크부터 내려놓는다!
+    이러면 deadlock에 빠지지 않고 계속 먹을 수 있다. 다만 시간에 따라 철학자가 사망하는건 어쩔 수 없는 일!
