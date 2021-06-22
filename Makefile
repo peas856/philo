@@ -4,7 +4,7 @@ FLAGS = -Wall -Wextra -Werror
 
 INC	= -I include
 
-SRCS = error.c eat.c error.c main.c print_msg.c thread.c util.c
+SRCS = error.c eat.c error.c main.c print_msg.c thread.c
 
 OBJ = $(SRCS:.c=.o)
 

@@ -1,34 +1,42 @@
-#include "philosophers.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   eat.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/06/19 04:02:19 by rhee              #+#    #+#             */
+/*   Updated: 2021/06/22 16:34:18 by rhee             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "./include/philosophers.h"
 
 void	take_forks(t_philo *philo)
 {
-	pthread_mutex_lock(&philo->op->forks_m[philo->left_fork]);
-	display_message(philo, 2);
-	pthread_mutex_lock(&philo->op->forks_m[philo->right_fork]);
-	display_message(philo, 2);
+	pthread_mutex_lock(philo->prev);
+	display_msg(philo, 2);
+	pthread_mutex_lock(&philo->forks_m);
+	display_msg(philo, 2);
+	
 }
 
 void	clean_forks(t_philo *philo)
 {
-	display_message(philo, 1);
-	pthread_mutex_unlock(&philo->op->forks_m[philo->left_fork]);
-	pthread_mutex_unlock(&philo->op->forks_m[philo->right_fork]);
+	display_msg(philo, 1);
+	pthread_mutex_unlock(philo->prev);
+	pthread_mutex_unlock(&philo->forks_m);
 	usleep(philo->op->time_to_sleep * 1000);
 }
 
 void	eat(t_philo *philo)
 {
-	struct timeval t;
-
-	pthread_mutex_lock(&philo->mutex);
 	philo->is_eating = 1;
-	gettimeofday(&t, NULL);
-	philo->last_eat = t.tv_sec;
-	philo->limit = philo->last_eat + philo->op->time_to_die;
-	display_message(philo, 0);
+	philo->dead_time = ft_time() + philo->op->time_to_die;
+	display_msg(philo, 0);
 	usleep(philo->op->time_to_eat * 1000);
 	philo->eat_count++;
+	if (philo->eat_count == philo->op->must_eat)
+		philo->op->finish_n++;
 	philo->is_eating = 0;
-	pthread_mutex_unlock(&philo->mutex);
-	pthread_mutex_unlock(&philo->eat_m);
 }
