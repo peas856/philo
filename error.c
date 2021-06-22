@@ -6,7 +6,7 @@
 /*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 13:21:51 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/22 16:11:46 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/22 16:42:58 by rhee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,4 +72,13 @@ int					ft_atoi(const char *str)
 		i++;
 	}
 	return (ret * sign);
+}
+
+void	ft_usleep(int length)
+{
+	long	time;
+
+	time = ft_time();
+	while (ft_time() < time + length)
+		usleep(length);
 }

@@ -6,7 +6,7 @@
 /*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 13:59:47 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/22 16:27:58 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/22 16:46:07 by rhee             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void        *monitor(void *philo_v)
 			pthread_mutex_unlock(&philo->op->killed);
 			return ((void*)0);
 		}
-		usleep(1000);
+		ft_usleep(1);
 	}
 }
 
@@ -72,7 +72,7 @@ void        *philosopher(void *philo_v)
 	philo = (t_philo*)philo_v;
 	if (philo->op->n_philo == 1)
 	{
-		usleep(100);
+		ft_usleep(1);
 		return ((void*)0);
 	}
 	philo->dead_time = ft_time() + philo->op->time_to_die;
@@ -109,7 +109,7 @@ int         ft_threads(t_op *data)
 		if (pthread_create(&tid, NULL, &philosopher, philo) != 0)
 			return (1);
 		pthread_detach(tid);
-		usleep(100);
+		ft_usleep(1);
 		i++;
 	}
 	return (0);

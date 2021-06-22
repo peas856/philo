@@ -43,6 +43,7 @@ long				ft_time(void);
 int     			ft_err(char *s);
 int					ft_atoi(char const *str);
 int					ft_clear(t_op *op);
+void				ft_usleep(int length);
 
 void        		ft_print(int option);
 void				display_msg(t_philo *philo, int option);
