@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: trhee <trhee@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 13:21:51 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/22 16:42:58 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/23 14:55:06 by trhee            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./include/philosophers.h"
 
-long	ft_time(void)
+long				ft_time(void)
 {
 	struct timeval	t;
 
@@ -20,24 +20,22 @@ long	ft_time(void)
 	return (t.tv_sec * 1000 + t.tv_usec / 1000);
 }
 
-int     ft_err(char *s)
+int					ft_err(char *s)
 {
 	if (s)
 		printf("%s\n", s);
 	return (1);
 }
 
-int ft_clear(t_op *op)
+int					ft_clear(t_op *op)
 {
-	int	i;
+	int				i;
 
 	if (op->philo)
 	{
 		i = 0;
 		while (i < op->n_philo)
-		{  
 			pthread_mutex_destroy(&op->philo[i++].forks_m);
-		}
 		free(op->philo);
 	}
 	pthread_mutex_destroy(&op->msg);
@@ -74,9 +72,9 @@ int					ft_atoi(const char *str)
 	return (ret * sign);
 }
 
-void	ft_usleep(int length)
+void				ft_usleep(int length)
 {
-	long	time;
+	long			time;
 
 	time = ft_time();
 	while (ft_time() < time + length)

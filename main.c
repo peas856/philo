@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: trhee <trhee@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 13:21:17 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/22 16:43:29 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/23 15:00:44 by trhee            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./include/philosophers.h"
 
-void        ft_philo(t_op *op)
+void			ft_philo(t_op *op)
 {
-	int	i;
+	int			i;
 
 	i = 0;
 	while (i < op->n_philo)
@@ -33,7 +33,7 @@ void        ft_philo(t_op *op)
 	pthread_mutex_lock(&op->killed);
 }
 
-int         ft_parse(t_op *op, int ac, char **av)
+int				ft_parse(t_op *op, int ac, char **av)
 {
 	op->n_philo = ft_atoi(av[1]);
 	op->time_to_die = ft_atoi(av[2]);
@@ -51,19 +51,19 @@ int         ft_parse(t_op *op, int ac, char **av)
 	return (0);
 }
 
-int         main(int ac, char **av)
+int				main(int ac, char **av)
 {
-	t_op	op;
+	t_op		op;
 
 	if (!(ac == 5 || ac == 6))
 		return (ft_err("error: Invalid arguments\n"));
 	if (ft_parse(&op, ac, av))
 		return (ft_clear(&op));
-    ft_philo(&op);
+	ft_philo(&op);
 	ft_threads(&op);
 	if (op.n_philo == 1)
 	{
-		usleep(op.time_to_die*1000);
+		ft_usleep(op.time_to_die);
 		display_msg(&op.philo[0], 5);
 		pthread_mutex_unlock(&op.killed);
 	}

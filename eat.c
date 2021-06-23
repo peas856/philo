@@ -3,25 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   eat.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: trhee <trhee@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/19 04:02:19 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/22 16:45:18 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/23 15:00:35 by trhee            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./include/philosophers.h"
 
-void	take_forks(t_philo *philo)
+void		take_forks(t_philo *philo)
 {
 	pthread_mutex_lock(philo->prev);
 	display_msg(philo, 2);
 	pthread_mutex_lock(&philo->forks_m);
 	display_msg(philo, 2);
-	
 }
 
-void	clean_forks(t_philo *philo)
+void		clean_forks(t_philo *philo)
 {
 	display_msg(philo, 1);
 	pthread_mutex_unlock(philo->prev);
@@ -29,7 +28,7 @@ void	clean_forks(t_philo *philo)
 	ft_usleep(philo->op->time_to_sleep);
 }
 
-void	eat(t_philo *philo)
+void		eat(t_philo *philo)
 {
 	philo->is_eating = 1;
 	philo->dead_time = ft_time() + philo->op->time_to_die;

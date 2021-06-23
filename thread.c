@@ -3,51 +3,32 @@
 /*                                                        :::      ::::::::   */
 /*   thread.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rhee <rhee@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: trhee <trhee@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/17 13:59:47 by rhee              #+#    #+#             */
-/*   Updated: 2021/06/22 16:46:07 by rhee             ###   ########.fr       */
+/*   Updated: 2021/06/23 14:52:40 by trhee            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./include/philosophers.h"
 
-// void        *monitor_count(void *state_v)
-// {
-// 	t_op    *data;
-// 	int		i;
-// 	int		total;
-
-// 	data = (t_op *)state_v;
-// 	total = 0;
-// 	while (total < data->must_eat)
-// 	{
-// 		i = 0;
-// 		while (i < data->n_philo)
-// 			pthread_mutex_lock(&data->philo[i++].eat_m);
-// 		total++;
-// 	}
-// 	pthread_mutex_unlock(&data->somebody_dead_m);
-// 	return ((void*)0);
-// }
-
-void        *monitor_count(void *op_v)
+void			*monitor_count(void *op_v)
 {
-	t_op    *op;
-	int		total;
+	t_op		*op;
+	int			total;
 
 	op = (t_op *)op_v;
 	total = 0;
 	while (1)
 	{
 		if (op->finish_n == op->n_philo)
-			break;
+			break ;
 	}
 	pthread_mutex_unlock(&op->killed);
 	return ((void*)0);
 }
 
-void        *monitor(void *philo_v)
+void			*monitor(void *philo_v)
 {
 	t_philo		*philo;
 
@@ -64,7 +45,7 @@ void        *monitor(void *philo_v)
 	}
 }
 
-void        *philosopher(void *philo_v)
+void			*philosopher(void *philo_v)
 {
 	t_philo		*philo;
 	pthread_t	tid;
@@ -89,7 +70,7 @@ void        *philosopher(void *philo_v)
 	return ((void*)0);
 }
 
-int         ft_threads(t_op *data)
+int				ft_threads(t_op *data)
 {
 	int			i;
 	pthread_t	tid;
